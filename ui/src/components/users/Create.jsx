@@ -14,7 +14,8 @@ export const action = async ({ request, params }) => {
     try {
         const newUser = await EntityService.set('users', Object.fromEntries(formData));
 
-        return redirect(`/users/${newUser.id}`);
+        // return redirect(`/users/${newUser.id}`);
+        return redirect(`/users`);
     } catch (e) {
         return e.reason;
     }

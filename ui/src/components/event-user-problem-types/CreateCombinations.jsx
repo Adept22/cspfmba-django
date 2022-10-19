@@ -5,6 +5,7 @@ import { Box, Paper, Stack, FormControl, InputLabel, OutlinedInput, FormHelperTe
 import TitledBox from '../common/TitledBox';
 
 import EntityService from '../../services/EntityService';
+import EntityField from '../common/EntityField';
 
 export const action = async ({ request, params }) => {
     const formData = await request.formData();
@@ -20,7 +21,7 @@ export const action = async ({ request, params }) => {
     }
 }
 
-const Create = () => {
+const CreateSingle = () => {
     const errors = useActionData() ?? {};
 
     return (
@@ -42,6 +43,24 @@ const Create = () => {
                 method="post"
                 sx={{ width: '600px', py: 2 }}
             >
+                <EntityField
+                    required
+                    id="event"
+                    entity="events"
+                    optionLabel="name"
+                    aria-describedby="event-helper-text"
+                    TextFieldProps={{
+                        name: "event",
+                        label: "Событие",
+                        error: 'event' in errors,
+                        helperText: errors?.['event'],
+                        sx: { mb: 2 }
+                    }}
+                    ControlProps={{
+                        fullWidth: true,
+                        required: true
+                    }}
+                />
                 <FormControl fullWidth required error={'name' in errors}>
                     <InputLabel htmlFor="name">Название</InputLabel>
                     <OutlinedInput
@@ -68,4 +87,4 @@ const Create = () => {
     );
 };
 
-export default Create;
+export default CreateSingle;

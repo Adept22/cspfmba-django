@@ -21,7 +21,8 @@ import ProblemTypes, { loader as problemTypesLoader } from './components/problem
 import CreateProblemType, { action as createProblemTypeAction } from './components/problem-types/Create';
 
 import EventUserProblemTypes, { loader as eventUserProblemTypesLoader } from './components/event-user-problem-types';
-import CreateEventUserProblemType, { action as createEventUserProblemTypeAction } from './components/event-user-problem-types/Create';
+import CreateSingleEventUserProblemType, { action as createSingleEventUserProblemTypeAction } from './components/event-user-problem-types/CreateSingle';
+import CreateCombinationsEventUserProblemType, { action as createCombinationsEventUserProblemTypeAction } from './components/event-user-problem-types/CreateCombinations';
 
 const router = createBrowserRouter([
     {
@@ -76,9 +77,15 @@ const router = createBrowserRouter([
                 breadcrumb: "Связи",
             },
             {
-                path: "event-user-problem-types/create",
-                action: createEventUserProblemTypeAction,
-                element: <CreateEventUserProblemType />,
+                path: "event-user-problem-types/create-single",
+                action: createSingleEventUserProblemTypeAction,
+                element: <CreateSingleEventUserProblemType />,
+                breadcrumb: "Новая связь",
+            },
+            {
+                path: "event-user-problem-types/create-combinations",
+                action: createCombinationsEventUserProblemTypeAction,
+                element: <CreateCombinationsEventUserProblemType />,
                 breadcrumb: "Новая связь",
             },
         ]

@@ -1,16 +1,51 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Form, Link } from 'react-router-dom';
 import { useLoaderData } from 'react-router';
-import { Divider, IconButton, Paper, Stack, Tooltip } from '@mui/material';
+import { Avatar, ButtonBase, Card, CardHeader, Divider, IconButton, MenuItem, Paper, Skeleton, Stack, Tooltip } from '@mui/material';
 
-import TitledBox from '../../components/common/TitledBox';
+import TitledBox from '../common/TitledBox';
+import OptionsButton from '../common/OptionsButton';
 
-import { AddIcon } from '../../icon';
 import EntityService from '../../services/EntityService';
 
-import EventsListItem from './list-item';
+import { AddIcon } from '../../icon';
+import { stringAvatar } from '../../utils'
 
 export const loader = async () => await EntityService.get('events');
+
+const ListItem = ({ id, index, name }) => {
+    name = name ?? `Событие ${index + 1}`;
+
+    return (
+        <Card variant="outlined">
+            <CardHeader
+                avatar={
+                    name
+                        ? <Avatar {...stringAvatar(name)} />
+                        : <Skeleton variant="circular" animation="wave" width="40px" height="40px" />
+                }
+                action={
+                    <OptionsButton id={`event-${id}`}>
+                        <MenuItem>
+                            Изменить
+                        </MenuItem>
+                        <Form
+                            method="post"
+                            action={`${id}/delete`}
+                            onSubmit={e => e.preventDefault()}
+                        >
+                            <MenuItem component={ButtonBase} type="submit" sx={{ width: '100%' }}>
+                                Удалить
+                            </MenuItem>
+                        </Form>
+                    </OptionsButton>
+                }
+                title={name ?? <Skeleton variant="text" animation="wave" width="200px" height="100%" />}
+                subheader={<Skeleton variant="text" animation="wave" width="130px" height="100%" />}
+            />
+        </Card>
+    )
+};
 
 const Events = () => {
     const events = useLoaderData();
@@ -36,11 +71,11 @@ const Events = () => {
                     >
                         <IconButton
                             component={Link}
-                            id={`event-add-button`}
+                            id={`events-add-button`}
                             color="primary"
                             aria-label="Добавить"
                             aria-haspopup="true"
-                            to="new"
+                            to="create"
                         >
                             <AddIcon />
                         </IconButton>
@@ -49,7 +84,7 @@ const Events = () => {
             }
         >
             <Stack direction="column" spacing={1}>
-                {events.map((event, i) => <EventsListItem key={event?.id ?? i} index={i} {...event} />)}
+                {events.map((event, i) => <ListItem key={event?.id ?? i} index={i} {...event} />)}
             </Stack>
         </TitledBox>
     )
