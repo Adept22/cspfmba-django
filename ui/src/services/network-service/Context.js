@@ -21,7 +21,7 @@ class Context
         let url = `${type}/`;
 
         if ('id' in params) {
-            url += `${params.id}`;
+            url += `${params.id}/`;
         }
 
         if (
@@ -47,18 +47,8 @@ class Context
         return params;
     }
 
-    getSort(entity = {}) {
-        const sortProps = ['_start', '_limit', '_order', '_sort'];
-
-        return Object.keys(entity)
-            .filter(key => sortProps.includes(key))
-            .reduce((obj, key) => {
-                obj[key] = entity[key];
-
-                delete entity[key]
-
-                return obj;
-            }, {});
+    getSort(sort = {}) {
+        return sort;
     }
 
     getResponse(json) {

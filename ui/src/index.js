@@ -13,16 +13,20 @@ import Home from './components/home';
 
 import Events, { loader as eventsLoader } from './components/events';
 import CreateEvent, { action as createEventAction } from './components/events/Create';
+import DeleteEvent, { action as deleteEventAction } from './components/events/Delete';
 
 import Users, { loader as usersLoader } from './components/users';
 import CreateUser, { action as createUserAction } from './components/users/Create';
+import DeleteUser, { action as deleteUserAction } from './components/users/Delete';
 
 import ProblemTypes, { loader as problemTypesLoader } from './components/problem-types';
 import CreateProblemType, { action as createProblemTypeAction } from './components/problem-types/Create';
+import DeleteProblemType, { action as deleteProblemTypeAction } from './components/problem-types/Delete';
 
 import EventUserProblemTypes, { loader as eventUserProblemTypesLoader } from './components/event-user-problem-types';
 import CreateSingleEventUserProblemType, { action as createSingleEventUserProblemTypeAction } from './components/event-user-problem-types/CreateSingle';
 import CreateCombinationsEventUserProblemType, { action as createCombinationsEventUserProblemTypeAction } from './components/event-user-problem-types/CreateCombinations';
+import DeleteEventUserProblemTypes, { action as deleteEventUserProblemTypesAction } from './components/event-user-problem-types/Delete';
 
 const router = createBrowserRouter([
     {
@@ -57,6 +61,12 @@ const router = createBrowserRouter([
                 action: createUserAction,
                 element: <CreateUser />,
                 breadcrumb: "Новый пользователь",
+            },
+            {
+                path: "users/:id/delete",
+                action: deleteUserAction,
+                element: <DeleteUser />,
+                breadcrumb: "Удалить пользователя",
             },
             {
                 path: "problem-types",

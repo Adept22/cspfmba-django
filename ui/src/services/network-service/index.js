@@ -20,7 +20,7 @@ class NetworkService {
      * @param {string} method
      * @param {object} entity
      */
-    fetch(method, type, entity = {}) {
+    fetch(method, type, entity = {}, sort = {}) {
         if (!this.context) throw new Error('Unknown context');
 
         return new Promise((resolve, reject) => {
@@ -35,7 +35,8 @@ class NetworkService {
             const clone = cleanDeep(JSON.parse(JSON.stringify(entity)));
 
             const params = this.context.getParams(clone);
-            const sort = this.context.getSort(clone);
+
+            sort = this.context.getSort(cleanDeep(JSON.parse(JSON.stringify(sort))));
 
             const url = this.context.getUrl(type, method, params, sort);
 

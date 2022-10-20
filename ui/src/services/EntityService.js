@@ -13,12 +13,12 @@ class EntityService {
      * 
      * @returns {Promise} Промис запроса
      */
-    get(type, entity = {}, context = DjangoContext) {
+    get(type, entity = {}, sort = {}, context = DjangoContext) {
         if (typeof entity !== 'object') {
             Promise.reject(new BadEntityException(type, entity));
         }
 
-        return this.send('GET', type, entity, context);
+        return this.send('GET', type, entity, sort, context);
     }
 
     /**
@@ -37,7 +37,7 @@ class EntityService {
                 Promise.reject(new BadEntityException(type, entity));
             }
 
-            return this.send("SET", type, item, context);
+            return this.send("SET", type, item, undefined, context);
         });
 
         if (requests.length > 0) {
@@ -63,7 +63,7 @@ class EntityService {
                 Promise.reject(new BadEntityException(type, entity));
             }
 
-            return this.send("DELETE", type, item, context);
+            return this.send("DELETE", type, item, undefined, context);
         });
 
         if (requests.length > 0) {
@@ -73,10 +73,10 @@ class EntityService {
         return Promise.resolve(Array.isArray(entity) ? [] : null);
     }
 
-    send(method, type, entity, context) {
+    send(method, type, entity, sort, context) {
         return new Promise((resolve, reject) => {
             NetworkService.setContext(context)
-                .fetch(method, type, entity)
+                .fetch(method, type, entity, sort)
                 .then(resolve)
                 .catch(ex => {
                     if (ex instanceof BaseException) {
