@@ -9,6 +9,7 @@ class EventSerializer(serializers.ModelSerializer):
         model = models.Event
         fields = '__all__'
         read_only_fields = ('id',)
+        depth = 2
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,6 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = models.User
         fields = '__all__'
         read_only_fields = ('id',)
+        depth = 2
 
 
 class ProblemTypeSerializer(serializers.ModelSerializer):
@@ -23,10 +25,24 @@ class ProblemTypeSerializer(serializers.ModelSerializer):
         model = models.ProblemType
         fields = '__all__'
         read_only_fields = ('id',)
+        depth = 2
 
 
 class EventUserProblemTypeSerializer(serializers.ModelSerializer):
+    event = EventSerializer()
+    user = UserSerializer()
+    problem_type = ProblemTypeSerializer()
+
+    # called on create/update operations
+    def to_internal_value(self, data):
+        self.fields['event'] = serializers.PrimaryKeyRelatedField(queryset=models.Event.objects.all())
+        self.fields['user'] = serializers.PrimaryKeyRelatedField(queryset=models.User.objects.all())
+        self.fields['problem_type'] = serializers.PrimaryKeyRelatedField(queryset=models.ProblemType.objects.all())
+
+        return super(EventUserProblemTypeSerializer, self).to_internal_value(data)
+
     class Meta:
         model = models.EventUserProblemType
         fields = '__all__'
         read_only_fields = ('id',)
+        depth = 2

@@ -1,10 +1,12 @@
 import React from 'react';
-import { Form, redirect, useActionData } from "react-router-dom";
+import { Form as RouterForm, redirect, useActionData, useLoaderData } from "react-router-dom";
 import { Box, Paper, Stack, FormControl, InputLabel, OutlinedInput, FormHelperText, Button } from '@mui/material';
 
-import TitledBox from '../common/TitledBox';
+import { TitledBox } from '../common';
 
 import EntityService from '../../services/EntityService';
+
+export const loader = async ({ params }) => await EntityService.get('problem-types', { id: params.id });
 
 export const action = async ({ request, params }) => {
     const formData = await request.formData();
@@ -12,21 +14,22 @@ export const action = async ({ request, params }) => {
     // TODO: Тут могла бы быть валидация
 
     try {
-        const newProblemType = await EntityService.set('problem-types', Object.fromEntries(formData));
-
-        return redirect(`/problem-types/${newProblemType.id}`);
+        await EntityService.set('problem-types', Object.fromEntries(formData));
     } catch (e) {
         return e.reason;
     }
+
+    return redirect(`/problem-types`);
 }
 
-const Create = () => {
+const Form = () => {
+    const problemType = useLoaderData() ?? {};
     const errors = useActionData() ?? {};
 
     return (
         <TitledBox
             component={Paper}
-            title="Новый тип проблемы"
+            title="Тип проблемы"
             sx={{ px: 2, width: '100%', height: '100%' }}
             contentProps={{
                 component: Stack,
@@ -38,10 +41,11 @@ const Create = () => {
             }}
         >
             <Box
-                component={Form}
+                component={RouterForm}
                 method="post"
                 sx={{ width: '600px', py: 2 }}
             >
+                <input type="hidden" name="id" value={problemType.id} />
                 <FormControl fullWidth required error={'name' in errors}>
                     <InputLabel htmlFor="name">Название</InputLabel>
                     <OutlinedInput
@@ -50,6 +54,7 @@ const Create = () => {
                         name="name"
                         label="Название"
                         aria-describedby="name-helper-text"
+                        value={problemType.name}
                     />
                     <FormHelperText id="name-helper-text">{errors?.['name']}</FormHelperText>
                 </FormControl>
@@ -68,4 +73,4 @@ const Create = () => {
     );
 };
 
-export default Create;
+export default Form;

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import useBreadcrumbs from "use-react-router-breadcrumbs";
 import { AppBar, Toolbar, IconButton, Breadcrumbs, Link as MuiLink } from '@mui/material';
 
-import { MenuIcon } from '../../../icon';
+import { MenuIcon } from '../../../../icon';
 
 import SideMenu from '../side-menu';
 

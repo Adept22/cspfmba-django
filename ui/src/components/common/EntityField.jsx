@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Autocomplete, CircularProgress } from '@mui/material';
 
 import EntityService from '../../services/EntityService';
 
-const EntityField = ({ entity, id, optionLabel, TextFieldProps }) => {
-    const [open, setOpen] = React.useState(false);
-    const [options, setOptions] = React.useState([]);
+const EntityField = ({ type, id, name, optionLabel, value, TextFieldProps }) => {
+    const [open, setOpen] = useState(false);
+    const [options, setOptions] = useState([]);
+    const [entity, setEntity] = useState(value);
     const loading = open && options.length === 0;
 
-    React.useEffect(() => {
+    useEffect(() => {
         let active = true;
 
         if (!loading) {
@@ -17,18 +18,18 @@ const EntityField = ({ entity, id, optionLabel, TextFieldProps }) => {
 
         (async () => {
             if (active) {
-                const entities = await EntityService.get(entity);
+                const entities = await EntityService.get(type);
 
-                setOptions([...entities]);
+                setOptions([...entities.results]);
             }
         })();
 
         return () => {
             active = false;
         };
-    }, [loading, entity]);
+    }, [loading, type]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!open) {
             setOptions([]);
         }
@@ -41,24 +42,32 @@ const EntityField = ({ entity, id, optionLabel, TextFieldProps }) => {
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            getOptionLabel={option => option[optionLabel]}
+            getOptionLabel={option => option[optionLabel] ?? ''}
             options={options}
             loading={loading}
-            renderInput={params => (
-                <TextField
-                    {...params}
-                    {...TextFieldProps}
-                    InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                            <React.Fragment>
-                                {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                {params.InputProps.endAdornment}
-                            </React.Fragment>
-                        ),
-                    }}
-                />
-            )}
+            value={entity}
+            onChange={(event, newValue) => setEntity(newValue)}
+            renderInput={params => {
+                console.log(params)
+                return (
+                    <>
+                        <input type="hidden" name={name} value={entity.id} />
+                        <TextField
+                            {...params}
+                            {...TextFieldProps}
+                            InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                    <>
+                                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                        {params.InputProps.endAdornment}
+                                    </>
+                                ),
+                            }}
+                        />
+                    </>
+                )
+            }}
         />
     );
 }

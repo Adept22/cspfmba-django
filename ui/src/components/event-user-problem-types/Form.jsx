@@ -1,27 +1,29 @@
 import React from 'react';
-import { Form, redirect, useActionData } from "react-router-dom";
-import { Box, Paper, Stack, FormControl, InputLabel, OutlinedInput, FormHelperText, Button } from '@mui/material';
+import { Form as RouterForm, redirect, useActionData, useLoaderData } from "react-router-dom";
+import { Box, Paper, Stack, Button } from '@mui/material';
 
-import TitledBox from '../common/TitledBox';
+import { TitledBox, EntityField } from '../common';
 
 import EntityService from '../../services/EntityService';
-import EntityField from '../common/EntityField';
 
-export const action = async ({ request, params }) => {
+export const loader = async ({ params }) => await EntityService.get('event-user-problem-types', { id: params.id });
+
+export const action = async ({ request }) => {
     const formData = await request.formData();
 
     // TODO: Тут могла бы быть валидация
 
     try {
-        const newEventUserProblemType = await EntityService.set('event-user-problem-types', Object.fromEntries(formData));
-
-        return redirect(`/event-user-problem-types/${newEventUserProblemType.id}`);
+        await EntityService.set('event-user-problem-types', Object.fromEntries(formData));
     } catch (e) {
         return e.reason;
     }
+
+    return redirect(`/event-user-problem-types`);
 }
 
-const CreateSingle = () => {
+const Form = () => {
+    const eupt = useLoaderData() ?? {};
     const errors = useActionData() ?? {};
 
     return (
@@ -39,21 +41,23 @@ const CreateSingle = () => {
             }}
         >
             <Box
-                component={Form}
+                component={RouterForm}
                 method="post"
                 sx={{ width: '600px', py: 2 }}
             >
+                <input type="hidden" name="id" value={eupt.id} />
                 <EntityField
                     id="event"
-                    entity="events"
+                    name="event"
+                    type="events"
                     optionLabel="name"
+                    value={eupt.event}
                     TextFieldProps={{
                         required: true,
-                        name: "event",
                         label: "Событие",
                         error: 'event' in errors,
                         helperText: errors?.['event'],
-                        sx: { mb: 2 }
+                        sx: { mb: 2 },
                     }}
                     ControlProps={{
                         fullWidth: true,
@@ -62,15 +66,16 @@ const CreateSingle = () => {
                 />
                 <EntityField
                     id="user"
-                    entity="users"
+                    name="user"
+                    type="users"
                     optionLabel="email"
+                    value={eupt.user}
                     TextFieldProps={{
                         required: true,
-                        name: "user",
                         label: "Пользователь",
                         error: 'user' in errors,
                         helperText: errors?.['user'],
-                        sx: { mb: 2 }
+                        sx: { mb: 2 },
                     }}
                     ControlProps={{
                         fullWidth: true,
@@ -79,15 +84,16 @@ const CreateSingle = () => {
                 />
                 <EntityField
                     id="problem-type"
-                    entity="problem-types"
+                    name="problem_type"
+                    type="problem-types"
                     optionLabel="name"
+                    value={eupt.problem_type}
                     TextFieldProps={{
                         required: true,
-                        name: "problem-type",
                         label: "Тип проблемы",
-                        error: 'problem-type' in errors,
-                        helperText: errors?.['problem-type'],
-                        sx: { mb: 2 }
+                        error: 'problem_type' in errors,
+                        helperText: errors?.['problem_type'],
+                        sx: { mb: 2 },
                     }}
                     ControlProps={{
                         fullWidth: true,
@@ -109,4 +115,4 @@ const CreateSingle = () => {
     );
 };
 
-export default CreateSingle;
+export default Form;

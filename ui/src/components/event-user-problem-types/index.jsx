@@ -1,15 +1,14 @@
 
 import React from 'react';
 import { useLoaderData } from 'react-router';
-import { Link, useSearchParams, useSubmit } from 'react-router-dom';
-import { Divider, IconButton, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material';
+import { Form, Link, useSearchParams } from 'react-router-dom';
+import { Divider, IconButton, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import TitledBox from '../common/TitledBox';
-import OptionsButton from '../common/OptionsButton';
+import { TitledBox, OptionsButton } from '../common';
 
 import EntityService from '../../services/EntityService';
 
-import { AddIcon, OpenInBrowserIcon, CloseIcon } from '../../icon';
+import { AddIcon, EditIcon, CloseIcon } from '../../icon';
 
 export const loader = async ({ request }) => {
     const url = new URL(request.url);
@@ -29,30 +28,20 @@ const Toolbar = () => (
         justifyContent="space-between"
         sx={{ height: '100%' }}
     >
-        <Tooltip
-            title="Добавить"
-            placement="top"
-            arrow
+        <OptionsButton
+            id="eupt-add-button"
+            icon={<AddIcon />}
+            IconButtonProps={{
+                "aria-label": "Добавить"
+            }}
         >
-            <OptionsButton
-                id="eupt-add-button"
-                icon={<AddIcon />}
-                IconButtonProps={{
-                    "aria-label": "Добавить"
-                }}
-            >
-                <MenuItem component={Link} to="create-single">Одиночные</MenuItem>
-                <MenuItem component={Link} to="create-combinations">Комбинации</MenuItem>
-            </OptionsButton>
-        </Tooltip>
+            <MenuItem component={Link} to="create">Одиночные</MenuItem>
+            <MenuItem component={Link} to="create-combinations">Комбинации</MenuItem>
+        </OptionsButton>
     </Stack>
 );
 
-const Row = ({ id, index, name }) => {
-    const submit = useSubmit();
-
-    name = name ?? `Связь ${index + 1}`;
-
+const Row = ({ id, index, event, user, problem_type }) => {
     return (
         <TableRow
             sx={{
@@ -65,41 +54,33 @@ const Row = ({ id, index, name }) => {
             }}
         >
             <TableCell>{index + 1}</TableCell>
-            <TableCell width="100%">{name}</TableCell>
+            <TableCell>{event.name}</TableCell>
+            <TableCell>{user.email}</TableCell>
+            <TableCell width="100%">{problem_type.name}</TableCell>
             <TableCell align="center">
-                <Tooltip
-                    title="Редактировать"
-                    placement="top"
-                    arrow
+                <IconButton
+                    component={Link}
+                    id={`edit-button-${id}`}
+                    color="primary"
+                    aria-label="Редактировать"
+                    aria-haspopup="true"
+                    to={`${id}/edit`}
                 >
-                    <IconButton
-                        component={Link}
-                        id={`edit-button-${id}`}
-                        color="primary"
-                        aria-label="Редактировать"
-                        aria-haspopup="true"
-                        to={`${id}/edit`}
-                    >
-                        <OpenInBrowserIcon />
-                    </IconButton>
-                </Tooltip>
+                    <EditIcon />
+                </IconButton>
             </TableCell>
             <TableCell align="center">
-                <Tooltip
-                    title="Удалить"
-                    placement="top"
-                    arrow
-                >
+                <Form method="post" action={`${id}/delete`}>
                     <IconButton
                         id={`delete-button-${id}`}
                         color="primary"
                         aria-label="Удалить"
                         aria-haspopup="true"
-                        onClick={() => submit(null, { action: `${id}/delete` })}
+                        type="submit"
                     >
                         <CloseIcon />
                     </IconButton>
-                </Tooltip>
+                </Form>
             </TableCell>
         </TableRow>
     )
@@ -122,7 +103,9 @@ const EventUserProblemTypes = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">№</TableCell>
-                            <TableCell>Название</TableCell>
+                            <TableCell>Событие</TableCell>
+                            <TableCell>Пользователь</TableCell>
+                            <TableCell>Тип проблемы</TableCell>
                             <TableCell align="center" colSpan={2}>Действия</TableCell>
                         </TableRow>
                     </TableHead>
@@ -143,7 +126,7 @@ const EventUserProblemTypes = () => {
                                 showFirstButton
                                 showLastButton
                                 rowsPerPageOptions={[15, 30, 50]}
-                                colSpan={4}
+                                colSpan={6}
                                 count={count}
                                 rowsPerPage={+searchParams.get('rowsPerPage') ?? 15}
                                 page={+searchParams.get('page') ?? 0}

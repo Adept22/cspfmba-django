@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 
-import { HomeIcon, EmojiEventsIcon, AccountCircleIcon, ErrorOutlineIcon, SyncProblemIcon } from '../../../icon';
+import { HomeIcon, EmojiEventsIcon, AccountCircleIcon, ErrorOutlineIcon, SyncProblemIcon } from '../../../../icon';
 
 const SideMenu = props => (
     <Drawer

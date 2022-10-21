@@ -2,26 +2,25 @@ import React from 'react';
 import { Form, redirect, useActionData } from "react-router-dom";
 import { Box, Paper, Stack, FormControl, InputLabel, OutlinedInput, FormHelperText, Button } from '@mui/material';
 
-import TitledBox from '../common/TitledBox';
+import { TitledBox, EntityField } from '../common';
 
 import EntityService from '../../services/EntityService';
-import EntityField from '../common/EntityField';
 
-export const action = async ({ request, params }) => {
+export const action = async ({ request }) => {
     const formData = await request.formData();
 
     // TODO: Тут могла бы быть валидация
 
     try {
-        const newEventUserProblemType = await EntityService.set('event-user-problem-types', Object.fromEntries(formData));
-
-        return redirect(`/event-user-problem-types/${newEventUserProblemType.id}`);
+        await EntityService.set('event-user-problem-types', Object.fromEntries(formData));
     } catch (e) {
         return e.reason;
     }
+
+    return redirect(`/event-user-problem-types`);
 }
 
-const CreateSingle = () => {
+const CreateCombinations = () => {
     const errors = useActionData() ?? {};
 
     return (
@@ -87,4 +86,4 @@ const CreateSingle = () => {
     );
 };
 
-export default CreateSingle;
+export default CreateCombinations;
