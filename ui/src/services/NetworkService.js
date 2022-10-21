@@ -1,17 +1,49 @@
 import cleanDeep from 'clean-deep';
 
-import MethodNotAllowedException from '../../exceptions/MethodNotAllowedException';
-import BadEntityException from '../../exceptions/BadEntityException';
-import FetchException from '../../exceptions/FetchException';
-import JsonParseException from '../../exceptions/JsonParseException';
+import MethodNotAllowedException from '../exceptions/MethodNotAllowedException';
+import BadEntityException from '../exceptions/BadEntityException';
+import FetchException from '../exceptions/FetchException';
+import JsonParseException from '../exceptions/JsonParseException';
 
 class NetworkService {
-    context = null;
+    baseUrl = `http://${process.env.REACT_APP_API_HOST}/api/v1`;
 
-    setContext(context) {
-        this.context = context;
+    switchMethod(method, params) {
+        if ('SET' === method) {
+            return ('id' in params) ? 'PUT' : 'POST';
+        }
 
-        return this;
+        return method;
+    }
+
+    getUrl(type, method, params, sort) {
+        let url = `${type}/`;
+
+        if ('id' in params) {
+            url += `${params.id}/`;
+        }
+
+        if (
+            method === 'GET' &&
+            !('id' in params) &&
+            Object.keys(sort).length > 0
+        ) {
+            url += '?' + new URLSearchParams(sort).toString();
+        }
+
+        return url;
+    }
+
+    getParams(entity = {}) {
+        const params = {};
+
+        if (typeof entity.id !== 'undefined') {
+            params.id = entity.id;
+
+            delete entity.id;
+        }
+
+        return params;
     }
 
     /**
@@ -21,8 +53,6 @@ class NetworkService {
      * @param {object} entity
      */
     fetch(method, type, entity = {}, sort = {}) {
-        if (!this.context) throw new Error('Unknown context');
-
         return new Promise((resolve, reject) => {
             if (!['GET', 'SET', 'DELETE'].includes(method)) {
                 reject(new MethodNotAllowedException(method));
@@ -34,13 +64,11 @@ class NetworkService {
 
             const clone = cleanDeep(JSON.parse(JSON.stringify(entity)));
 
-            const params = this.context.getParams(clone);
+            const params = this.getParams(clone);
 
-            sort = this.context.getSort(cleanDeep(JSON.parse(JSON.stringify(sort))));
+            const url = this.getUrl(type, method, params, sort);
 
-            const url = this.context.getUrl(type, method, params, sort);
-
-            method = this.context.switchMethod(method, params);
+            method = this.switchMethod(method, params);
 
             this._fetch(method, url, undefined, clone)
                 .then(resolve)
@@ -49,16 +77,11 @@ class NetworkService {
     }
 
     _fetch(method, url, headers, body) {
-        if (!this.context) throw new Error('Unknown context');
-
         return new Promise((resolve, reject) => {
-            const contextHeaders = this.context.getHeaders();
-
-            fetch(this.context.baseUrl + '/' + url, {
+            fetch(this.baseUrl + '/' + url, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json; charset=utf-8',
-                    ...contextHeaders,
                     ...headers
                 },
                 method,
@@ -68,15 +91,7 @@ class NetworkService {
                 if (response.ok) {
                     if (response.status !== 204) {
                         response.json()
-                            .then(json => {
-                                try {
-                                    const data = this.context.getResponse(json);
-
-                                    resolve(data);
-                                } catch (ex) {
-                                    reject(new FetchException(method, url, body, ex));
-                                }
-                            })
+                            .then(resolve)
                             .catch(ex => reject(new JsonParseException(ex.message)));
                     } else {
                         resolve();
@@ -87,7 +102,7 @@ class NetworkService {
                         .catch(ex => reject(new JsonParseException(ex.message)));
                 }
             })
-            .catch(ex => reject(new FetchException(method, url, body, ex.message)));
+                .catch(ex => reject(new FetchException(method, url, body, ex.message)));
         });
     }
 }

@@ -1,4 +1,5 @@
 ARG PYTHON_VERSION=3.10
+ARG NODEJS_VERSION=19.0
 
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:${PYTHON_VERSION}-alpine as django_python
@@ -28,3 +29,15 @@ RUN chmod +x manage.py
 ENTRYPOINT ["docker-entrypoint"]
 
 CMD ["manage.py", "runserver", "0.0.0.0:80"]
+
+FROM node:${NODEJS_VERSION}-alpine as react_nodejs
+
+WORKDIR /srv/ui
+
+COPY ui/package*.json ./
+
+RUN npm install
+
+COPY ui/ .
+
+CMD ["npm", "run-script", "start"]

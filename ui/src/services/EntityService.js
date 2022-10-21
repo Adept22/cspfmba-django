@@ -1,5 +1,4 @@
-import NetworkService from './network-service';
-import DjangoContext from './network-service/DjangoContext';
+import NetworkService from './NetworkService';
 import BaseException from '../exceptions/BaseException';
 import BadEntityException from '../exceptions/BadEntityException';
 import EntityFetchException from '../exceptions/EntityFetchException';
@@ -13,12 +12,12 @@ class EntityService {
      * 
      * @returns {Promise} Промис запроса
      */
-    get(type, entity = {}, sort = {}, context = DjangoContext) {
+    get(type, entity = {}, sort = {}) {
         if (typeof entity !== 'object') {
             Promise.reject(new BadEntityException(type, entity));
         }
 
-        return this.send('GET', type, entity, sort, context);
+        return this.send('GET', type, entity, sort);
     }
 
     /**
@@ -29,7 +28,7 @@ class EntityService {
      * 
      * @returns {Promise} Промис запроса
      */
-    set(type, entity = {}, context = DjangoContext) {
+    set(type, entity = {}) {
         const entities = [].concat(entity).filter(Object);
 
         const requests = entities.map(item => {
@@ -37,7 +36,7 @@ class EntityService {
                 Promise.reject(new BadEntityException(type, entity));
             }
 
-            return this.send("SET", type, item, undefined, context);
+            return this.send("SET", type, item);
         });
 
         if (requests.length > 0) {
@@ -55,7 +54,7 @@ class EntityService {
      * 
      * @returns {Promise} Промис запроса
      */
-    delete(type, entity = {}, context = DjangoContext) {
+    delete(type, entity = {}) {
         const entities = [].concat(entity).filter(Object);
 
         const requests = entities.map(item => {
@@ -63,7 +62,7 @@ class EntityService {
                 Promise.reject(new BadEntityException(type, entity));
             }
 
-            return this.send("DELETE", type, item, undefined, context);
+            return this.send("DELETE", type, item);
         });
 
         if (requests.length > 0) {
@@ -73,10 +72,9 @@ class EntityService {
         return Promise.resolve(Array.isArray(entity) ? [] : null);
     }
 
-    send(method, type, entity, sort, context) {
+    send(method, type, entity, sort) {
         return new Promise((resolve, reject) => {
-            NetworkService.setContext(context)
-                .fetch(method, type, entity, sort)
+            NetworkService.fetch(method, type, entity, sort)
                 .then(resolve)
                 .catch(ex => {
                     if (ex instanceof BaseException) {

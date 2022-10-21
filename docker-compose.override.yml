@@ -9,3 +9,6 @@ services:
       # If you develop on Mac you can remove the var/ directory from the bind-mount
       # for better performance by enabling the next line 
       # - /srv/app/var
+  react:
+    volumes:
+      - ./ui:/srv/ui:rw,cached
