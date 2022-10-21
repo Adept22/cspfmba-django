@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, redirect, useActionData } from "react-router-dom";
-import { Box, Paper, Stack, FormControl, InputLabel, OutlinedInput, FormHelperText, Button } from '@mui/material';
+import { Box, Paper, Stack, Button } from '@mui/material';
 
 import { TitledBox, EntityField } from '../common';
 
@@ -8,11 +8,24 @@ import EntityService from '../../services/EntityService';
 
 export const action = async ({ request }) => {
     const formData = await request.formData();
+    const data = Object.fromEntries(formData);
+
+    data.event = data.event?.split(';');
+    data.user = data.user?.split(';');
+    data.problem_type = data.problem_type?.split(';');
+    
+    const entities = data.event.map(e => 
+        data.user.map(u => 
+            data.problem_type.map(pt => 
+                ({event: e, user: u, problem_type: pt})
+            )
+        ).flat()
+    ).flat();
 
     // TODO: Тут могла бы быть валидация
 
     try {
-        await EntityService.set('event-user-problem-types', Object.fromEntries(formData));
+        await EntityService.set('event-user-problem-types', entities);
     } catch (e) {
         return e.reason;
     }
@@ -43,34 +56,59 @@ const CreateCombinations = () => {
                 sx={{ width: '600px', py: 2 }}
             >
                 <EntityField
-                    required
                     id="event"
-                    entity="events"
+                    name="event"
+                    type="events"
                     optionLabel="name"
-                    aria-describedby="event-helper-text"
+                    multiple
                     TextFieldProps={{
-                        name: "event",
+                        required: true,
                         label: "Событие",
                         error: 'event' in errors,
                         helperText: errors?.['event'],
-                        sx: { mb: 2 }
+                        sx: { mb: 2 },
                     }}
                     ControlProps={{
                         fullWidth: true,
                         required: true
                     }}
                 />
-                <FormControl fullWidth required error={'name' in errors}>
-                    <InputLabel htmlFor="name">Название</InputLabel>
-                    <OutlinedInput
-                        required
-                        id="name"
-                        name="name"
-                        label="Название"
-                        aria-describedby="name-helper-text"
-                    />
-                    <FormHelperText id="name-helper-text">{errors?.['name']}</FormHelperText>
-                </FormControl>
+                <EntityField
+                    id="user"
+                    name="user"
+                    type="users"
+                    optionLabel="email"
+                    multiple
+                    TextFieldProps={{
+                        required: true,
+                        label: "Пользователь",
+                        error: 'user' in errors,
+                        helperText: errors?.['user'],
+                        sx: { mb: 2 },
+                    }}
+                    ControlProps={{
+                        fullWidth: true,
+                        required: true
+                    }}
+                />
+                <EntityField
+                    id="problem_type"
+                    name="problem_type"
+                    type="problem-types"
+                    optionLabel="name"
+                    multiple
+                    TextFieldProps={{
+                        required: true,
+                        label: "Тип проблемы",
+                        error: 'problem_type' in errors,
+                        helperText: errors?.['problem_type'],
+                        sx: { mb: 2 },
+                    }}
+                    ControlProps={{
+                        fullWidth: true,
+                        required: true
+                    }}
+                />
                 <Button
                     type="submit"
                     margin="normal"

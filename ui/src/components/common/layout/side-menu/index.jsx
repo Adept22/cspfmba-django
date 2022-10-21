@@ -1,7 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
-
-import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { NavLink } from "react-router-dom";
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
 import { HomeIcon, EmojiEventsIcon, AccountCircleIcon, ErrorOutlineIcon, SyncProblemIcon } from '../../../../icon';
 
@@ -24,26 +23,26 @@ const SideMenu = props => (
         }}
     >
         <List>
-            <ListItem component={Link} button divider to="/">
+            <ListItemButton component={NavLink} divider to="/">
                 <ListItemIcon><HomeIcon /></ListItemIcon>
                 <ListItemText  primary="Рабочий стол" />
-            </ListItem>
-            <ListItem component={Link} button to="/events">
+            </ListItemButton>
+            <ListItemButton component={NavLink} to="/events">
                 <ListItemIcon><EmojiEventsIcon /></ListItemIcon>
                 <ListItemText primary="События" />
-            </ListItem>
-            <ListItem component={Link} button to="/users">
+            </ListItemButton>
+            <ListItemButton component={NavLink} to="/users">
                 <ListItemIcon><AccountCircleIcon /></ListItemIcon>
                 <ListItemText primary="Пользователи" />
-            </ListItem>
-            <ListItem component={Link} button to="/problem-types">
+            </ListItemButton>
+            <ListItemButton component={NavLink} to="/problem-types">
                 <ListItemIcon><ErrorOutlineIcon /></ListItemIcon>
                 <ListItemText primary="Типы проблем" />
-            </ListItem>
-            <ListItem component={Link} button to="/event-user-problem-types">
+            </ListItemButton>
+            <ListItemButton component={NavLink} to="/event-user-problem-types">
                 <ListItemIcon><SyncProblemIcon /></ListItemIcon>
                 <ListItemText primary="Связи" />
-            </ListItem>
+            </ListItemButton>
         </List>
     </Drawer>
 );

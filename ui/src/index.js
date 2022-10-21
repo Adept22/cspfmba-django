@@ -26,7 +26,7 @@ import DeleteProblemType, { action as deleteProblemTypeAction } from './componen
 import EventUserProblemTypes, { loader as eventUserProblemTypesLoader } from './components/event-user-problem-types';
 import FormEventUserProblemType, { action as formEventUserProblemTypeAction, loader as formEventUserProblemTypeLoader } from './components/event-user-problem-types/Form';
 import CreateCombinationsEventUserProblemType, { action as createCombinationsEventUserProblemTypeAction } from './components/event-user-problem-types/CreateCombinations';
-import DeleteEventUserProblemTypes, { action as deleteEventUserProblemTypesAction } from './components/event-user-problem-types/Delete';
+import DeleteEventUserProblemType, { action as deleteEventUserProblemTypeAction } from './components/event-user-problem-types/Delete';
 
 const router = createBrowserRouter([
     {
@@ -108,6 +108,12 @@ const router = createBrowserRouter([
                 breadcrumb: "Редактирование типа проблемы",
             },
             {
+                path: "problem-types/:id/delete",
+                action: deleteProblemTypeAction,
+                element: <DeleteProblemType />,
+                breadcrumb: "Удалить тип проблемы",
+            },
+            {
                 path: "event-user-problem-types",
                 loader: eventUserProblemTypesLoader,
                 element: <EventUserProblemTypes />,
@@ -131,6 +137,12 @@ const router = createBrowserRouter([
                 loader: formEventUserProblemTypeLoader,
                 element: <FormEventUserProblemType />,
                 breadcrumb: "Редактирование связи",
+            },
+            {
+                path: "event-user-problem-types/:id/delete",
+                action: deleteEventUserProblemTypeAction,
+                element: <DeleteEventUserProblemType />,
+                breadcrumb: "Удалить связь",
             },
         ]
     },

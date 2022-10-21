@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form as RouterForm, redirect, useActionData, useLoaderData } from "react-router-dom";
-import { Box, Paper, Stack, FormControl, InputLabel, OutlinedInput, FormHelperText, Button } from '@mui/material';
+import { Box, Paper, Stack, FormControl, InputLabel, OutlinedInput, FormHelperText, Button, FormControlLabel, Checkbox } from '@mui/material';
 
 import { TitledBox } from '../common';
 
@@ -11,15 +11,18 @@ export const loader = async ({ params }) => await EntityService.get('events', { 
 export const action = async ({ request }) => {
     const formData = await request.formData();
 
+    let entity = Object.fromEntries(formData);
+    delete entity.addAnotherOne;
+
     // TODO: Тут могла бы быть валидация
 
     try {
-        await EntityService.set('events', Object.fromEntries(formData));
+        await EntityService.set('events', entity);
     } catch (e) {
         return e.reason;
     }
 
-    return redirect(`/events`);
+    return redirect(formData.has('addAnotherOne') ? '' : `/events`);
 }
 
 const Form = () => {
@@ -58,6 +61,7 @@ const Form = () => {
                     />
                     <FormHelperText id="name-helper-text">{errors?.['name']}</FormHelperText>
                 </FormControl>
+                <FormControlLabel control={<Checkbox defaultChecked name="addAnotherOne" />} label="Сохранить и добавить еще" />
                 <Button
                     type="submit"
                     margin="normal"
